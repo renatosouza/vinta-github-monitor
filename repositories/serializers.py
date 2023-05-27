@@ -17,6 +17,7 @@ class RepositorySerializer(serializers.ModelSerializer):
         return GitHubData(token, user, repo_name).get_data_github()
 
     def create(self, validated_data):
+        Repository.objects.filter(name=validated_data['name']).delete()
         repository_instance = Repository.objects.create(**validated_data)
         github_data_for_model = []
         for commit in self._data_from_github:
@@ -32,6 +33,7 @@ class RepositorySerializer(serializers.ModelSerializer):
             return name
         except exceptions.HTTPError as error:
             raise serializers.ValidationError('Repository does not exist!')
+
     class Meta:
         model = Repository
         fields = ('name',)

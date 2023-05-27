@@ -16,7 +16,7 @@ class CommitListView(generics.ListAPIView):
     filterset_class = CommitFilter
 
 
-class RepositoryCreateView(generics.CreateAPIView):
+class RepositoryCreateView(generics.ListCreateAPIView):
     serializer_class = RepositorySerializer
     queryset = Repository.objects.all()
     permission_classes = [IsAuthenticated]
