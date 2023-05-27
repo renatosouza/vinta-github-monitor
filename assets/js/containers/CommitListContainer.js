@@ -3,52 +3,45 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
-// import { updatePage } from './../actions/PageActions';
-// import ReactPaginate from 'react-paginate';
-// import Paginate from '../components/Paginate';
+import ReactPaginate from 'react-paginate';
 
 class CommitListContainer extends React.Component {
   state = {
-    loading: true,
+    loading: false,
+    authorName: '',
+    repoName: '',
   }
 
   componentDidMount() {
-    // const { currentPage, totalPages } = this.props;
-    // console.log(currentPage, totalPages);
-    commitAPI.getCommits({page: 1}, () => {
-      this.setState({loading: false});
-    });
+    this.fetchCommits(1);
   }
 
-  // componentDidUpdate(prevProps) {
-  //   const { currentPage, totalPages } = this.props;
-  //   console.log(currentPage, totalPages);
-  //   if (currentPage !== prevProps.currentPage) {
-  //     commitAPI.getCommits(currentPage);
-  //   }
-  // }
-
   handleAuthorName = (authorName) => {
-    this.setState({loading: true});
-    commitAPI.getCommits({page: 1, authorName: authorName}, () => {
-      this.setState({loading: false});
+    this.setState({ authorName: authorName, repoName: '' }, () => {
+      this.fetchCommits(1);
     });
   }
 
   handleRepoName = (repoName) => {
-    this.setState({loading: true});
-    commitAPI.getCommits({page: 1, repoName: repoName}, () => {
-      this.setState({loading: false});
+    this.setState({ authorName: '', repoName: repoName }, () => {
+      this.fetchCommits(1);
     });
   }
 
-  // handlePageClick(data) {
-  //   const selectedPage = data.selected;
-  //   store.dispatch(updatePage(selectedPage))
-  // }
+  handlePageClick = (pageNumber) => {
+    const pageClicked = pageNumber.selected + 1;
+    this.fetchCommits(pageClicked);
+  }
+
+  fetchCommits = (page) => {
+    this.setState({ loading: true });
+    commitAPI.getCommits({ page: page, authorName: this.state.authorName, repoName: this.state.repoName }, () => {
+      this.setState({ loading: false });
+    });
+  }
 
   render() {
-    const {commits} = this.props;
+    const { commits, totalPages, currentPage } = this.props;
     return (
       <div className={this.state.loading? "loader-container" : ""}>
         {this.state.loading? (
@@ -60,18 +53,27 @@ class CommitListContainer extends React.Component {
             onClickRepoName={this.handleRepoName}
           />
         )}
-
-
-        {/* <Paginate
-          currentPage={currentPage}
-          totalPages={totalPages}
-        /> */}
-
-        {/* <ReactPaginate
+        <ReactPaginate
+          nextLabel="&raquo;"
+          onPageChange={this.handlePageClick}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          forcePage={currentPage-1}
           pageCount={totalPages}
-          forcePage={currentPage}
-          onPageChange={handlePageClick}
-        /> */}
+          previousLabel="&laquo;"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          breakLabel="..."
+          breakClassName="page-item"
+          breakLinkClassName="page-link"
+          containerClassName="pagination pagination-sm justify-content-end"
+          activeClassName="active"
+          renderOnZeroPageCount={null}
+        />
       </div>
     );
   }
@@ -81,10 +83,10 @@ CommitListContainer.propTypes = {
   commits: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-const mapStateToProps = store => ({
-  commits: store.commitState.commits,
-  // currentPage: store.commitState.currentPage,
-  // totalPages: store.commitState.totalPages,
+const mapStateToProps = state => ({
+  commits: state.commitState.commits,
+  currentPage: state.pageState.currentPage,
+  totalPages: state.pageState.totalPages,
 });
 
 export default connect(mapStateToProps)(CommitListContainer);
