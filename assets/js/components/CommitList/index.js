@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 const CommitList = (props) => {
-  const {commits} = props;
+  const { commits, onClickAuthorName, onClickRepoName } = props;
+
+  const handleSelectAuthor = (authorName) => {
+    onClickAuthorName(authorName);
+  };
+
+  const handleSelectRepository = (repoName) => {
+    onClickRepoName(repoName);
+  };
+
   return (
     <div>
       {commits.length !== 0 && (
@@ -23,13 +32,23 @@ const CommitList = (props) => {
                       {commit.message}
                     </p>
                     <small className="text-muted">
-                      {commit.author}
+                      <a
+                        className="filter-property"
+                        onClick={() => handleSelectAuthor(commit.author)}
+                      >
+                        {commit.author}
+                      </a>
                       {' '}
                       authored
                       {' '}
                       on
                       {' '}
-                      {commit.repository}
+                      <a
+                        className="filter-property"
+                        onClick={() => handleSelectRepository(commit.repository)}
+                      >
+                        {commit.repository}
+                      </a>
                       {' '}
                       at
                       {' '}
