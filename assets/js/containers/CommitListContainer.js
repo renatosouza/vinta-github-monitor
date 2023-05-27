@@ -1,31 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
 import ReactPaginate from 'react-paginate';
+import { changeAuthorName, changeRepoName } from '../actions/FilterActions';
 
 class CommitListContainer extends React.Component {
   state = {
     loading: false,
-    authorName: '',
-    repoName: '',
   }
 
   componentDidMount() {
     this.fetchCommits(1);
   }
 
-  handleAuthorName = (authorName) => {
-    this.setState({ authorName: authorName, repoName: '' }, () => {
+  componentDidUpdate(prevProps) {
+    const { authorName, repoName } = this.props;
+    if( prevProps.authorName !== authorName || prevProps.repoName !== repoName ) {
       this.fetchCommits(1);
-    });
+    }
+  }
+
+  handleAuthorName = (authorName) => {
+    const { dispatch } = this.props;
+    dispatch(changeAuthorName(authorName));
   }
 
   handleRepoName = (repoName) => {
-    this.setState({ authorName: '', repoName: repoName }, () => {
-      this.fetchCommits(1);
-    });
+    const { dispatch } = this.props;
+    dispatch(changeRepoName(repoName));
   }
 
   handlePageClick = (pageNumber) => {
@@ -34,8 +38,9 @@ class CommitListContainer extends React.Component {
   }
 
   fetchCommits = (page) => {
+    const { authorName, repoName } = this.props;
     this.setState({ loading: true });
-    commitAPI.getCommits({ page: page, authorName: this.state.authorName, repoName: this.state.repoName }, () => {
+    commitAPI.getCommits({ page: page, authorName: authorName, repoName: repoName }, () => {
       this.setState({ loading: false });
     });
   }
@@ -87,6 +92,8 @@ const mapStateToProps = state => ({
   commits: state.commitState.commits,
   currentPage: state.pageState.currentPage,
   totalPages: state.pageState.totalPages,
+  authorName: state.filterState.authorName,
+  repoName: state.filterState.repoName,
 });
 
 export default connect(mapStateToProps)(CommitListContainer);
