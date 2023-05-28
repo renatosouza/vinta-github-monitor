@@ -2,7 +2,7 @@ import axios from 'axios';
 import {reset} from 'redux-form';
 import store from '../store';
 import {
-  createRepositorySuccess, getCommitsSuccess,
+  createRepositorySuccess, getRepositoriesSuccess, getCommitsSuccess,
 } from '../actions/CommitActions';
 import { updateTotalPages, updatePage } from '../actions/PageActions';
 
@@ -32,4 +32,12 @@ export const createRepository = (values, headers, formDispatch) => axios.post('/
       const err = error.response.data;
       console.error(err);
     }
+  });
+
+export const getRepositories = () => axios.get('/api/repositories/')
+  .then((response) => {
+    store.dispatch(getRepositoriesSuccess(response.data));
+  }).catch((error) => {
+    const err = error.response.data;
+    console.error(err);
   });

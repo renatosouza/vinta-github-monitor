@@ -11,7 +11,6 @@ const filterReducer = (state = initialState, action) => {
       return {...state, authorName: action.payload, repoName: ''}
     }
     case types.CHANGE_REPO_NAME: {
-      console.log("vou mudar o estado");
       return {...state, authorName: '', repoName: action.payload}
     }
     default:

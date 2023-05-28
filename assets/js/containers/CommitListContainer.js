@@ -48,9 +48,11 @@ class CommitListContainer extends React.Component {
   render() {
     const { commits, totalPages, currentPage } = this.props;
     return (
-      <div className={this.state.loading? "loader-container" : ""}>
+      <div>
         {this.state.loading? (
-          <span className="loader"></span>
+          <div className="loader-container">
+            <span className="loader"></span>
+          </div>
         ) : (
           <CommitList
             commits={commits}
