@@ -132,17 +132,31 @@ a.filter-property {
   cursor: pointer;
 }
 
+.loader-container-repo-bar {
+  height: 70vh;
+}
+
+.loader-container-commit-list {
+  height: 90vh;
+}
+
 .loader-container {
   display: flex;
-  height: 100vh;
   align-items: center;
   justify-content: center;
+}
+
+.loader-white-background {
+  border: 5px solid #000;
+}
+
+.loader-color-background {
+  border: 5px solid #fff;
 }
 
 .loader {
   width: 48px;
   height: 48px;
-  border: 5px solid #000;
   border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;
@@ -157,4 +171,34 @@ a.filter-property {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.loader-inside-button {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite
+}
+
+.loader-inside-button::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 3px solid #FFF;
+  animation: prixClipFix 2s linear infinite ;
+}
+
+@keyframes rotate {
+  100%   {transform: rotate(360deg)}
+}
+
+@keyframes prixClipFix {
+  0%   {clip-path:polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)}
+  25%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)}
+  50%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)}
+  75%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)}
+  100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}
 }

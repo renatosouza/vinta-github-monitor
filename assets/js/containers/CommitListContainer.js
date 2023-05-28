@@ -5,12 +5,9 @@ import * as commitAPI from '../api/CommitAPI';
 import CommitList from '../components/CommitList';
 import ReactPaginate from 'react-paginate';
 import { changeAuthorName, changeRepoName } from '../actions/FilterActions';
+import { changeLoadingCommitListStatus } from '../actions/LoadingActions';
 
 class CommitListContainer extends React.Component {
-  state = {
-    loading: false,
-  }
-
   componentDidMount() {
     this.fetchCommits(1);
   }
@@ -38,20 +35,19 @@ class CommitListContainer extends React.Component {
   }
 
   fetchCommits = (page) => {
-    const { authorName, repoName } = this.props;
-    this.setState({ loading: true });
-    commitAPI.getCommits({ page: page, authorName: authorName, repoName: repoName }, () => {
-      this.setState({ loading: false });
-    });
+    const { dispatch, authorName, repoName } = this.props;
+    dispatch(changeLoadingCommitListStatus(true));
+    commitAPI.getCommits({ page: page, authorName: authorName, repoName: repoName });
+
   }
 
   render() {
-    const { commits, totalPages, currentPage } = this.props;
+    const { commits, totalPages, currentPage, loadingCommitList } = this.props;
     return (
       <div>
-        {this.state.loading? (
-          <div className="loader-container">
-            <span className="loader"></span>
+        {loadingCommitList? (
+          <div className="loader-container loader-container-commit-list">
+            <span className="loader loader-white-background"></span>
           </div>
         ) : (
           <CommitList
@@ -96,6 +92,7 @@ const mapStateToProps = state => ({
   totalPages: state.pageState.totalPages,
   authorName: state.filterState.authorName,
   repoName: state.filterState.repoName,
+  loadingCommitList: state.loadingState.loadingCommitList,
 });
 
 export default connect(mapStateToProps)(CommitListContainer);

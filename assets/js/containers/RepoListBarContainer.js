@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import * as commitAPI from '../api/CommitAPI';
-import { changeRepoName } from "../actions/FilterActions";
+import { changeRepoName } from '../actions/FilterActions';
+import { changeLoadingRepoListStatus } from '../actions/LoadingActions';
 
 class RepoListBarContainer extends React.Component {
   componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(changeLoadingRepoListStatus(true));
     commitAPI.getRepositories();
   }
 
@@ -16,18 +19,30 @@ class RepoListBarContainer extends React.Component {
   }
 
   render() {
-    const { repositories } = this.props;
+    const { repositories, loadingRepoList } = this.props;
 
     return (
-      <ul className="nav flex-column">
-        {repositories.map((repository, index) => (
-          <li className="nav-item" key={index}>
-            <Link to="/" className="nav-link" onClick={() => this.handleSelectRepo(repository.name)}>
-              {repository.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div>
+        {loadingRepoList? (
+          <div className="loader-container loader-container-repo-bar">
+            <span className="loader loader-color-background"></span>
+          </div>
+        ) : (
+          <ul className="nav flex-column">
+            {repositories.map((repository, index) => (
+              <li className="nav-item" key={index}>
+                <Link
+                  to="/"
+                  className="nav-link"
+                  onClick={() => this.handleSelectRepo(repository.name)}
+                >
+                  {repository.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     );
   }
 }
@@ -38,6 +53,7 @@ RepoListBarContainer.propTypes = {
 
 const mapStateToProps = state => ({
   repositories: state.commitState.repositories,
+  loadingRepoList: state.loadingState.loadingRepoList,
 });
 
 export default connect(mapStateToProps)(RepoListBarContainer);

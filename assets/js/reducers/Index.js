@@ -5,6 +5,7 @@ import {reducer as formReducer} from 'redux-form';
 import commitReducer from './CommitReducer';
 import pageReducer from './PageReducer';
 import filterReducer from './FilterReducer';
+import loadingReducer from './LoadingReducer';
 
 // Combine Reducers
 const reducers = combineReducers({
@@ -12,6 +13,7 @@ const reducers = combineReducers({
   commitState: commitReducer,
   pageState: pageReducer,
   filterState: filterReducer,
+  loadingState: loadingReducer,
 });
 
 export default reducers;

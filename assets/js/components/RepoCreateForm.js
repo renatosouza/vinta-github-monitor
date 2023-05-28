@@ -54,8 +54,12 @@ const RepoCreateForm = (props) => {
             />
           </div>
           <div className="col-2">
-            <button disabled={pristine || submitting} className="btn btn-block btn-primary" type="submit">
-              Submit
+            <button disabled={pristine || submitting} className="btn btn-block btn-primary loader-container" type="submit">
+              {submitting? (
+                <span className="loader-inside-button"></span>
+              ) : (
+                <span>Submit</span>
+              )}
             </button>
           </div>
         </div>
