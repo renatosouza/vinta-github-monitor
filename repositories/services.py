@@ -1,4 +1,5 @@
 from requests import request, ConnectionError
+from .exceptions import RepositoryDoesNotExistException
 
 
 class GitHubClient:
@@ -18,8 +19,11 @@ class GitHubClient:
                 headers=self.get_headers(headers),
                 timeout=self.default_timeout
             )
-            if not response.ok:
-                response.raise_for_status()
+            if response.status_code == 404:
+                raise RepositoryDoesNotExistException(
+                    "Repository does not exist!"
+                )
+            response.raise_for_status()
             return response.json()
         except ConnectionError or TimeoutError as error:
             raise error

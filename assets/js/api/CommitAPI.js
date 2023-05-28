@@ -2,7 +2,7 @@ import axios from 'axios';
 import {reset} from 'redux-form';
 import store from '../store';
 import {
-  createRepositorySuccess, getRepositoriesSuccess, getCommitsSuccess,
+  createRepositoryAction, getRepositoriesSuccess, getCommitsSuccess,
 } from '../actions/CommitActions';
 import { updateTotalPages, updatePage } from '../actions/PageActions';
 import { changeLoadingCommitListStatus,
@@ -28,17 +28,21 @@ export const getCommits = ({ page = 1, authorName = '', repoName = '' }={}) => a
 
 export const createRepository = (values, headers, formDispatch) => axios.post('/api/repositories/', values, {headers})
   .then((response) => {
-    store.dispatch(createRepositorySuccess(response.data, true));
+    store.dispatch(createRepositoryAction(true, false, ''));
     formDispatch(reset('repoCreate'));
     store.dispatch(changeLoadingCommitListStatus(true));
     getCommits();
     store.dispatch(changeLoadingRepoListStatus(true));
     getRepositories();
   }).catch((error) => {
+    let errorFeedback = '';
     if (error.response && error.response.data) {
       const err = error.response.data;
-      console.error(err);
+      errorFeedback = Object.values(err)[0][0]
+    } else {
+      errorFeedback = 'Error!'
     }
+    store.dispatch(createRepositoryAction(false, true, errorFeedback));
   });
 
 export const getRepositories = () => axios.get('/api/repositories/')

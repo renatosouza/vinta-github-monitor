@@ -3,7 +3,7 @@ from django.utils.functional import cached_property
 
 from .models import Commit, Repository
 from .utils import GitHubData
-from requests import exceptions
+from .tasks import FetchGithubDataTask
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -14,6 +14,7 @@ class RepositorySerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         social = user.social_auth.get(provider='github')
         token = social.extra_data['access_token']
+        # return FetchGithubDataTask(token, user, repo_name).delay()
         return GitHubData(token, user, repo_name).get_data_github()
 
     def create(self, validated_data):
@@ -31,8 +32,8 @@ class RepositorySerializer(serializers.ModelSerializer):
         try:
             self._data_from_github
             return name
-        except exceptions.HTTPError as error:
-            raise serializers.ValidationError('Repository does not exist!')
+        except Exception as error:
+            raise serializers.ValidationError(error.message)
 
     class Meta:
         model = Repository
