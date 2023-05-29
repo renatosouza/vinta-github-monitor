@@ -5,37 +5,57 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Repository',
+            name="Repository",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
             ],
             options={
-                'verbose_name_plural': 'Repositories',
+                "verbose_name_plural": "Repositories",
             },
         ),
         migrations.CreateModel(
-            name='Commit',
+            name="Commit",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('message', models.TextField()),
-                ('sha', models.CharField(max_length=100)),
-                ('author', models.CharField(max_length=50)),
-                ('url', models.URLField()),
-                ('date', models.DateTimeField()),
-                ('avatar', models.URLField(blank=True)),
-                ('repository', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='repositories.Repository')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("message", models.TextField()),
+                ("sha", models.CharField(max_length=100)),
+                ("author", models.CharField(max_length=50)),
+                ("url", models.URLField()),
+                ("date", models.DateTimeField()),
+                ("avatar", models.URLField(blank=True)),
+                (
+                    "repository",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="repositories.Repository",
+                    ),
+                ),
             ],
             options={
-                'ordering': ('-date',),
+                "ordering": ("-date",),
             },
         ),
     ]

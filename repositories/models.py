@@ -8,7 +8,7 @@ class Repository(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = 'Repositories'
+        verbose_name_plural = "Repositories"
 
 
 class Commit(models.Model):
@@ -25,4 +25,4 @@ class Commit(models.Model):
         return self.message
 
     class Meta:
-        ordering = ('-date',)
+        ordering = ("-date",)
