@@ -1,5 +1,6 @@
 from requests import request, ConnectionError
 from .exceptions import RepositoryDoesNotExistException
+from datetime import datetime, timedelta
 
 
 class GitHubClient:
@@ -11,7 +12,8 @@ class GitHubClient:
     default_timeout = 100
 
     def get_commits(self, owner, repo, headers={}):
-        path = f'/repos/{owner}/{repo}/commits'
+        one_month_ago = self.get_one_month_ago()
+        path = f'/repos/{owner}/{repo}/commits?since={one_month_ago}'
         try:
             response = request(
                 'get',
@@ -21,7 +23,7 @@ class GitHubClient:
             )
             if response.status_code == 404:
                 raise RepositoryDoesNotExistException(
-                    "Repository does not exist!"
+                    "The repository does not exist!"
                 )
             response.raise_for_status()
             return response.json()
@@ -33,3 +35,8 @@ class GitHubClient:
 
     def get_headers(self, headers):
         return {**self.default_headers, **headers}
+
+    def get_one_month_ago(self):
+        today = datetime.now()
+        one_month_ago = today - timedelta(days=30)
+        return one_month_ago.strftime('%Y-%m-%dT%H:%M:%SZ')
