@@ -33,6 +33,10 @@ To execute commands such as migrations, run:
 
 `$ docker-compose run api python manage.py migrate`
 
+To execute tests, run:
+
+`$ docker-compose run api python manage.py test`
+
 To check the logs for:
 - Django application, run: `docker-compose logs -f api`.
 - Webpack, run: `docker-compose logs -f webpack`.
