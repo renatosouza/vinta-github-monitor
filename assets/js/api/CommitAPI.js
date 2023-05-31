@@ -8,33 +8,49 @@ import { updateTotalPages, updatePage } from '../actions/PageActions';
 import { changeLoadingCommitListStatus,
   changeLoadingRepoListStatus
 } from '../actions/LoadingActions';
+import { changeRepoName } from '../actions/FilterActions';
 
 export const getCommits = ({ page = 1, authorName = '', repoName = '' }={}) => axios
   .get(`/api/commits/?author=${authorName}&repository=${repoName}&page=${page}`)
   .then((response) => {
     store.dispatch(getCommitsSuccess({...response.data.results}));
+
     const totalResults = response.data.count;
     const resultsPerPage = response.data.page_size;
-    if(totalResults && resultsPerPage) {
-      const totalPages = Math.ceil(totalResults/resultsPerPage);
-      store.dispatch(updateTotalPages(totalPages));
-
-    } else {
-      store.dispatch(updateTotalPages(0));
-    }
+    const totalPages = Math.ceil(totalResults/resultsPerPage);
+    store.dispatch(updateTotalPages(totalPages));
     store.dispatch(updatePage(page));
+
     store.dispatch(changeLoadingCommitListStatus(false));
+  })
+  .catch((error) => {
+    const err = error.response.data;
+    console.error(err);
   });
 
-export const createRepository = (values, headers, formDispatch) => axios.post('/api/repositories/', values, {headers})
+export const getRepositories = () => axios.get('/api/repositories/')
+  .then((response) => {
+    store.dispatch(getRepositoriesSuccess(response.data));
+
+    store.dispatch(changeLoadingRepoListStatus(false));
+  }).catch((error) => {
+    const err = error.response.data;
+    console.error(err);
+  });
+
+export const createRepository = (values, headers, formDispatch) => axios
+  .post('/api/repositories/', values, {headers})
   .then((response) => {
     store.dispatch(createRepositoryAction(true, false, ''));
     formDispatch(reset('repoCreate'));
-    store.dispatch(changeLoadingCommitListStatus(true));
-    getCommits();
+
     store.dispatch(changeLoadingRepoListStatus(true));
     getRepositories();
-  }).catch((error) => {
+
+    store.dispatch(changeLoadingCommitListStatus(true));
+    pollingCommits(response.data.name);
+  })
+  .catch((error) => {
     let errorFeedback = '';
     if (error.response && error.response.data) {
       const err = error.response.data;
@@ -45,11 +61,40 @@ export const createRepository = (values, headers, formDispatch) => axios.post('/
     store.dispatch(createRepositoryAction(false, true, errorFeedback));
   });
 
-export const getRepositories = () => axios.get('/api/repositories/')
+const pollingCommits = (repoName) => {
+  const pollingInterval = 1000;
+  const pollingTimeout = 10000;
+
+  const interval = setInterval(() => getCommitsPolling(repoName), pollingInterval);
+
+  const timeout = setTimeout(() => {
+    clearInterval(interval);
+    store.dispatch(updateTotalPages(0));
+    store.dispatch(updatePage(1));
+
+    store.dispatch(getCommitsSuccess({...[]}));
+    store.dispatch(changeLoadingCommitListStatus(false));
+  }, pollingTimeout);
+
+  const getCommitsPolling = (repoName) => axios
+  .get(`/api/commits/?repository=${repoName}&page=1`)
   .then((response) => {
-    store.dispatch(getRepositoriesSuccess(response.data));
-    store.dispatch(changeLoadingRepoListStatus(false));
-  }).catch((error) => {
-    const err = error.response.data;
-    console.error(err);
+    const totalResults = response.data.count;
+    if (totalResults) {
+      const resultsPerPage = response.data.page_size;
+      const totalPages = Math.ceil(totalResults/resultsPerPage);
+      store.dispatch(updateTotalPages(totalPages));
+      store.dispatch(updatePage(1));
+
+      store.dispatch(changeRepoName(repoName));
+      store.dispatch(getCommitsSuccess({...response.data.results}));
+      store.dispatch(changeLoadingCommitListStatus(false));
+      stopPolling();
+    }
   });
+
+  const stopPolling = () => {
+    clearInterval(interval);
+    clearTimeout(timeout);
+  }
+}
