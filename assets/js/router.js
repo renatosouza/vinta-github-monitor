@@ -5,6 +5,7 @@ import {
 import CommitListContainer from './containers/CommitListContainer';
 import RepoCreateContainer from './containers/RepoCreateContainer';
 import RepoListBarContainer from './containers/RepoListBarContainer';
+import TitleLink from './components/TitleLink';
 
 export default (
     <Router>
@@ -13,9 +14,7 @@ export default (
             <div id="sidebar-wrapper">
                 <ul className="sidebar-nav">
                     <li className="sidebar-brand">
-                        <Link to="/">
-                            Github Monitor
-                        </Link>
+                        <TitleLink title="Github Monitor"/>
                     </li>
                     <RepoListBarContainer />
                 </ul>
