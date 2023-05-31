@@ -26,19 +26,17 @@ class RepositoryViewSet(viewsets.ModelViewSet):
     queryset = Repository.objects.all()
     permission_classes = [IsAuthenticated]
     pagination_class = None
-    lookup_field = 'name'
+    lookup_field = "name"
 
     def create(self, request):
         user = request.user
         social = user.social_auth.get(provider="github")
         token = social.extra_data["access_token"]
-        repo_name = request.data.get('name')
+        repo_name = request.data.get("name")
         try:
             GitHubData(token, user.username, repo_name).check_repo_github()
         except HTTPError:
-            raise serializers.ValidationError(
-                "The repository doesn't exist!"
-            )
+            raise serializers.ValidationError("The repository doesn't exist!")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

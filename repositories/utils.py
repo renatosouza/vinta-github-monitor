@@ -35,6 +35,7 @@ class GitHubData:
             "date": commit.get("commit").get("author").get("date"),
             "avatar": (
                 commit.get("author").get("avatar_url")
-                if commit.get("author", None) else ""
+                if commit.get("author", None)
+                else ""
             ),
         }

@@ -6,10 +6,12 @@ from .models import Commit, Repository
 
 class RepositorySerializer(serializers.ModelSerializer):
     name = serializers.CharField(
-        validators=[UniqueValidator(
-            queryset=Repository.objects.all(),
-            message='A repository with this name already exists!'
-        )]
+        validators=[
+            UniqueValidator(
+                queryset=Repository.objects.all(),
+                message="A repository with this name already exists!",
+            )
+        ]
     )
 
     class Meta:

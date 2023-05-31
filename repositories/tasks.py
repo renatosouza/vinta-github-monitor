@@ -2,7 +2,6 @@
 # Uncomment and create your tasks here.
 from celery import shared_task
 from .utils import GitHubData
-from .serializers import RepositorySerializer
 from .models import Repository, Commit
 
 

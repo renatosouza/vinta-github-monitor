@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.utils import IntegrityError
 
 
 class Repository(models.Model):
