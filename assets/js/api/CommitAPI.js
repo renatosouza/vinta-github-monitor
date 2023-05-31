@@ -20,23 +20,40 @@ export const getCommits = ({ page = 1, authorName = '', repoName = '' }={}) => a
     const totalPages = Math.ceil(totalResults/resultsPerPage);
     store.dispatch(updateTotalPages(totalPages));
     store.dispatch(updatePage(page));
-
-    store.dispatch(changeLoadingCommitListStatus(false));
   })
   .catch((error) => {
     const err = error.response.data;
     console.error(err);
+  })
+  .finally(() => {
+    store.dispatch(changeLoadingCommitListStatus(false));
   });
 
 export const getRepositories = () => axios.get('/api/repositories/')
   .then((response) => {
     store.dispatch(getRepositoriesSuccess(response.data));
-
-    store.dispatch(changeLoadingRepoListStatus(false));
-  }).catch((error) => {
+  })
+  .catch((error) => {
     const err = error.response.data;
     console.error(err);
+  })
+  .finally(() => {
+    store.dispatch(changeLoadingRepoListStatus(false));
   });
+
+export const deleteRepository = (repoName, headers) => axios
+  .delete(`/api/repositories/${repoName}`, {headers: headers})
+  .then((response) => {
+    store.dispatch(changeRepoName(''));
+  })
+  .catch((error) => {
+    const err = error.response.data;
+    console.error(err);
+  })
+  .finally(() => {
+    getRepositories();
+    getCommits();
+  })
 
 export const createRepository = (values, headers, formDispatch) => axios
   .post('/api/repositories/', values, {headers})
@@ -54,9 +71,9 @@ export const createRepository = (values, headers, formDispatch) => axios
     let errorFeedback = '';
     if (error.response && error.response.data) {
       const err = error.response.data;
-      errorFeedback = Object.values(err)[0][0]
+      errorFeedback = err[0] || Object.values(err)[0][0];
     } else {
-      errorFeedback = 'Error!'
+      errorFeedback = 'Error!';
     }
     store.dispatch(createRepositoryAction(false, true, errorFeedback));
   });

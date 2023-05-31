@@ -127,6 +127,23 @@ body {
   }
 }
 
+ul.repo-bar-nav {
+  position: relative;
+}
+
+ul.repo-bar-nav>li.sidebar-brand {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 30px;
+  padding-left: 10px;
+}
+
+ul.repo-bar-nav>li.sidebar-brand>a.deleting{
+  font-size: 14px;
+}
+
 a.filter-property {
   color: #007bff !important;
   cursor: pointer;
