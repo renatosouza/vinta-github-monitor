@@ -1,6 +1,4 @@
 from .services import GitHubClient
-from .exceptions import RepositoryDoesNotExistException
-from requests.exceptions import HTTPError
 
 
 class GitHubData:
@@ -10,41 +8,22 @@ class GitHubData:
         self.repo = repo
 
     def get_data_github(self):
-        try:
-            github_client = GitHubClient()
-            github_data = github_client.get_commits(
-                self.owner, self.repo, self.get_token_header()
-            )
-            if not github_data:
-                return self.add_error_info(
-                    github_data,
-                    True,
-                    True,
-                    (
-                        "The repository doesn't have \
-                        any commits in the last 30 days!"
-                    ),
-                )
-            return self.add_error_info(self.filter_data(github_data))
-        except RepositoryDoesNotExistException as error:
-            return self.add_error_info(None, True, True, error.message)
-        except HTTPError or ConnectionError or TimeoutError as error:
-            return self.add_error_info(None, True, False, error.message)
+        github_client = GitHubClient()
+        github_data = github_client.get_commits(
+            self.owner, self.repo, self.get_token_header()
+        )
+        return self.format_data(github_data)
 
-    def add_error_info(
-        self, data, error=False, field_error=False, error_message=None
-    ):
-        return {
-            "data": data,
-            "error": error,
-            "field_error": field_error,
-            "error_message": error_message,
-        }
+    def check_repo_github(self):
+        github_client = GitHubClient()
+        return github_client.get_repository(
+            self.owner, self.repo, self.get_token_header()
+        )
 
     def get_token_header(self):
         return {"Authorization": "Bearer " + self.token}
 
-    def filter_data(self, data):
+    def format_data(self, data):
         return [self.specific_data_from_commit(commit) for commit in data]
 
     def specific_data_from_commit(self, commit):
