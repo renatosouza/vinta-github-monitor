@@ -4,7 +4,6 @@ from rest_framework import generics, viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .exceptions import RepositoryDoesNotExistException
 from .models import Commit, Repository
 from .serializers import CommitSerializer, RepositorySerializer
 from .filters import CommitFilter
